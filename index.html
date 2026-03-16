@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIREキャッシュフローシミュレータ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Retirement Cashflow Planner</p>
+        <h1>FIREキャッシュフローシミュレータ</h1>
+        <p class="hero-copy">
+          公的年金、iDeCo、特定口座、国民年金、保険料を年次比較。
+          税・社会保険料は日本向け簡易モデル。現状は墨田区固定値。
+        </p>
+      </header>
+
+      <main class="layout">
+        <section class="panel form-panel">
+          <div class="panel-header" id="formPanelHeader">
+            <h2>前提</h2>
+            <button id="sampleButton" class="ghost-button" type="button">初期値に戻す</button>
+          </div>
+
+          <form id="simulatorForm">
+            <div class="form-grid">
+              <fieldset>
+                <legend>生活・期間</legend>
+                <label>
+                  リタイア時現金
+                  <input name="cashBalance" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+                <label>
+                  リタイア年齢
+                  <input name="retirementAge" type="number" min="45" max="90" step="1" />
+                </label>
+                <label>
+                  終了年齢
+                  <input name="endAge" type="number" min="60" max="110" step="1" />
+                </label>
+                <label>
+                  運用利回り
+                  <div class="input-suffix">
+                    <input name="growthRate" type="number" min="-10" max="20" step="0.1" />
+                    <span>%</span>
+                  </div>
+                </label>
+                <label>
+                  年間生活費
+                  <input name="annualSpending" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+              </fieldset>
+
+              <fieldset>
+                <legend>国民年金・公的年金</legend>
+                <label>
+                  支払終了年齢（国民年金）
+                  <input name="nationalPensionEndAge" type="number" min="40" max="80" step="1" />
+                </label>
+                <label>
+                  受給開始年齢（公的年金）
+                  <input name="publicPensionStartAge" type="number" min="60" max="80" step="1" />
+                </label>
+                <label>
+                  年間受給額（公的年金）
+                  <input name="publicPensionAnnual" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+              </fieldset>
+
+              <fieldset>
+                <legend>iDeCo</legend>
+                <label>
+                  リタイア時残高
+                  <input name="idecoBalance" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+                <label>
+                  年間拠出額
+                  <input name="idecoAnnualContribution" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+                <label>
+                  拠出終了年齢
+                  <input name="idecoContributionEndAge" type="number" min="50" max="75" step="1" />
+                </label>
+                <label>
+                  リタイア時継続年数
+                  <input name="idecoServiceYears" type="number" min="1" max="50" step="1" />
+                </label>
+              </fieldset>
+
+              <fieldset>
+                <legend>特定口座</legend>
+                <label>
+                  リタイア時残高
+                  <input name="taxableBalance" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+                <label>
+                  リタイア時取得原価
+                  <input name="taxableCostBasis" type="text" inputmode="numeric" data-format="currency" />
+                </label>
+              </fieldset>
+
+            </div>
+          </form>
+
+          <div class="note-card">
+            <h3>前提</h3>
+            <ul>
+              <li>単身前提。配偶者控除、世帯課税判定なし。</li>
+              <li>公的年金とiDeCo年金は合算。iDeCo拠出は掛金控除で簡易反映。</li>
+              <li>iDeCo一時金は退職所得控除ベース。他退職金との通算なし。</li>
+              <li>iDeCo拠出の既定値は第1号・任意加入の上限。月6.8万円、年81.6万円。</li>
+              <li>社会保険料は墨田区国保、東京都後期高齢者医療の固定値。</li>
+              <li>65歳以上の介護保険料は単身前提、前年所得ベース段階表の概算。</li>
+              <li>収入と取り崩しは現金流入。生活費、税、保険料は現金流出。</li>
+              <li>国民年金保険料は生活費と別計上。</li>
+              <li>特定口座の譲渡益は、確定申告時のみ社会保険料算定に反映。</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel result-panel">
+          <div class="result-toolbar" id="resultToolbar">
+            <div class="result-status-block">
+              <div id="resultStatusText" class="result-status-text"></div>
+              <div class="progress-wrap" id="progressWrap" aria-live="polite">
+                <div class="progress-bar" aria-hidden="true">
+                  <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">進捗 0%</div>
+              </div>
+            </div>
+            <label class="inline-select top-select">
+              確定申告
+              <select id="taxFilingSelect">
+                <option value="withholding">しない（特定口座源泉徴収）</option>
+                <option value="separate">する（申告分離課税）</option>
+              </select>
+            </label>
+          </div>
+          <div class="panel-header" id="resultPanelHeader">
+            <h2>比較</h2>
+          </div>
+
+          <div id="summaryCards" class="summary-grid"></div>
+
+          <section class="panel inset-panel">
+            <div class="panel-header">
+              <h3>年次キャッシュフロー</h3>
+            </div>
+            <div id="insightBox" class="insight-box"></div>
+            <div class="table-wrap">
+              <p class="table-unit">金額単位: 千円</p>
+              <table id="resultTable">
+                <thead>
+                  <tr>
+                    <th rowspan="2">年齢</th>
+                    <th colspan="4" class="group-income boundary-left">収入</th>
+                    <th colspan="7" class="group-expense boundary-left">支出</th>
+                    <th colspan="6" class="group-asset boundary-left">資産</th>
+                  </tr>
+                  <tr>
+                    <th class="group-income boundary-left">公的年金</th>
+                    <th class="group-income">iDeCo<br />受取</th>
+                    <th class="group-income">特定口座<br />売却額</th>
+                    <th class="group-income">収入合計</th>
+                    <th class="group-expense boundary-left">生活費</th>
+                    <th class="group-expense">国民年金<br />保険料</th>
+                    <th class="group-expense">iDeCo<br />拠出</th>
+                    <th class="group-expense"><span class="hint" data-tooltip="雑所得ベースの課税所得に基礎控除を反映。譲渡益の所得税は原則15.315%。">所得税</span></th>
+                    <th class="group-expense"><span class="hint" data-tooltip="通常所得は10%。譲渡益の住民税は原則5%。">住民税</span></th>
+                    <th class="group-expense"><span class="hint" data-tooltip="墨田区固定値ベース。75歳未満と75歳以上で切替。申告分離課税時は譲渡益を算定所得に反映。">社会<br />保険料</span></th>
+                    <th class="group-expense">支出合計</th>
+                    <th class="group-asset boundary-left">現金</th>
+                    <th class="group-asset">iDeCo<br />増加分</th>
+                    <th class="group-asset">iDeCo<br />残高</th>
+                    <th class="group-asset">特定口座<br />増加分</th>
+                    <th class="group-asset">特定口座<br />資産</th>
+                    <th class="group-asset">総資産</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel inset-panel sources-panel">
+            <h3>制度前提</h3>
+            <p>
+              2026年3月17日時点の公式情報ベース。
+              社会保険料は墨田区固定値。65歳以上の介護保険料は単身前提、前年所得ベース段階表の概算。
+              個別要素は別途確認。住民税申告、配当、譲渡損失繰越、退職金重複年など。
+            </p>
+            <ul>
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1600.htm" target="_blank" rel="noreferrer">国税庁 No.1600 公的年金等の課税関係</a></li>
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1420.htm" target="_blank" rel="noreferrer">国税庁 No.1420 退職金を受け取ったとき</a></li>
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" rel="noreferrer">国税庁 No.2260 所得税の税率</a></li>
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm" target="_blank" rel="noreferrer">国税庁 No.1199 基礎控除</a></li>
+              <li><a href="https://www.ideco-koushiki.jp/join/benefits.html" target="_blank" rel="noreferrer">iDeCo公式 給付について</a></li>
+              <li><a href="https://www.city.sumida.lg.jp/kurashi/kenkouhoken/kokuminkenkouhoken/kokuhoryoukeisan.html" target="_blank" rel="noreferrer">墨田区 国民健康保険料の計算</a></li>
+              <li><a href="https://www.city.sumida.lg.jp/kenko_fukushi/koureisya_kaigohoken/kaigo_riyou_houhou/kaigohokennryo.html" target="_blank" rel="noreferrer">墨田区 65歳以上の介護保険料</a></li>
+              <li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/koukikourei/index.html" target="_blank" rel="noreferrer">厚労省 高齢者医療制度</a></li>
+              <li><a href="https://www.tokyo-ikiiki.net/seido/insurance/insurance01.html" target="_blank" rel="noreferrer">東京都後期高齢者医療広域連合 保険料</a></li>
+              <li><a href="https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html" target="_blank" rel="noreferrer">日本年金機構 国民年金保険料</a></li>
+            </ul>
+            <div class="reference-table-wrap">
+              <table class="reference-table">
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>固定値</th>
+                    <th>参照元</th>
+                  </tr>
+                </thead>
+                <tbody id="referenceTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

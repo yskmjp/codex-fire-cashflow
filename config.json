@@ -1,0 +1,121 @@
+{
+  "defaults": {
+    "cashBalance": 10000000,
+    "retirementAge": 50,
+    "endAge": 95,
+    "annualSpending": 2700000,
+    "nationalPensionEndAge": 59,
+    "growthRate": 4,
+    "publicPensionStartAge": 65,
+    "publicPensionAnnual": 900000,
+    "idecoBalance": 5000000,
+    "idecoAnnualContribution": 816000,
+    "idecoContributionEndAge": 64,
+    "idecoServiceYears": 25,
+    "taxableBalance": 45000000,
+    "taxableCostBasis": 33000000,
+    "taxFilingMode": "withholding"
+  },
+  "nationalPension": {
+    "monthlyPremium": 17510
+  },
+  "insurance": {
+    "deduction": 430000,
+    "under75": [
+      {
+        "label": "国民健康保険 医療分",
+        "rate": 0.0771,
+        "fixed": 47300
+      },
+      {
+        "label": "国民健康保険 後期高齢者支援金分",
+        "rate": 0.0269,
+        "fixed": 16800
+      }
+    ],
+    "care40to64": {
+      "label": "国民健康保険 介護分",
+      "rate": 0.0225,
+      "fixed": 16600
+    },
+    "care65Plus": {
+      "assumption": "単身前提・前年所得ベース",
+      "nonTaxableStages": [
+        {
+          "stage": 1,
+          "maxReferenceIncome": 800000,
+          "annualPremium": 22572
+        },
+        {
+          "stage": 2,
+          "maxReferenceIncome": 1200000,
+          "annualPremium": 29304
+        },
+        {
+          "stage": 3,
+          "maxReferenceIncome": 999999999,
+          "annualPremium": 54252
+        }
+      ],
+      "taxableStages": [
+        {
+          "stage": 6,
+          "maxTotalIncome": 1250000,
+          "annualPremium": 89100
+        },
+        {
+          "stage": 7,
+          "maxTotalIncome": 1900000,
+          "annualPremium": 99000
+        },
+        {
+          "stage": 8,
+          "maxTotalIncome": 2500000,
+          "annualPremium": 118800
+        },
+        {
+          "stage": 9,
+          "maxTotalIncome": 3500000,
+          "annualPremium": 132660
+        },
+        {
+          "stage": 10,
+          "maxTotalIncome": 5000000,
+          "annualPremium": 150480
+        },
+        {
+          "stage": 11,
+          "maxTotalIncome": 7500000,
+          "annualPremium": 188100
+        },
+        {
+          "stage": 12,
+          "maxTotalIncome": 10000000,
+          "annualPremium": 209880
+        },
+        {
+          "stage": 13,
+          "maxTotalIncome": 15000000,
+          "annualPremium": 233640
+        },
+        {
+          "stage": 14,
+          "maxTotalIncome": 20000000,
+          "annualPremium": 261360
+        },
+        {
+          "stage": 15,
+          "maxTotalIncome": 999999999,
+          "annualPremium": 289080
+        }
+      ]
+    },
+    "over75": [
+      {
+        "label": "後期高齢者医療保険",
+        "rate": 0.0967,
+        "fixed": 47300
+      }
+    ]
+  }
+}
