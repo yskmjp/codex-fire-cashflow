@@ -172,8 +172,9 @@ function buildInputs(config, filingMode) {
 }
 
 async function loadSimulator(configFileName) {
-  const appJs = fs.readFileSync(path.join(__dirname, "app.js"), "utf8");
-  const config = JSON.parse(fs.readFileSync(path.join(__dirname, configFileName), "utf8"));
+  const projectRoot = path.resolve(__dirname, "..");
+  const appJs = fs.readFileSync(path.join(projectRoot, "app.js"), "utf8");
+  const config = JSON.parse(fs.readFileSync(path.join(projectRoot, configFileName), "utf8"));
   const context = createContext(config);
   vm.runInNewContext(appJs, context, { filename: "app.js" });
   vm.runInContext("yieldDuringHeavyWork = async () => {}", context);

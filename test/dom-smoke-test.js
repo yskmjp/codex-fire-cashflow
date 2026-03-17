@@ -48,8 +48,9 @@ class FakeElement {
 }
 
 async function main() {
-  const appJs = fs.readFileSync(path.join(__dirname, "app.js"), "utf8");
-  const config = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
+  const projectRoot = path.resolve(__dirname, "..");
+  const appJs = fs.readFileSync(path.join(projectRoot, "app.js"), "utf8");
+  const config = JSON.parse(fs.readFileSync(path.join(projectRoot, "config.json"), "utf8"));
 
   const fieldsByName = new Map();
   const currencyInputs = [];

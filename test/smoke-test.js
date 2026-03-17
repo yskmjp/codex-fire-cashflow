@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const root = __dirname;
+const root = path.resolve(__dirname, "..");
 const indexPath = path.join(root, "index.html");
 const appPath = path.join(root, "app.js");
 const configPath = path.join(root, "config.json");
