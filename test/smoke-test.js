@@ -1,4 +1,4 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..");
@@ -29,7 +29,7 @@ function main() {
   const app = readUtf8(appPath);
   const config = JSON.parse(readUtf8(configPath));
 
-  assert(/<title>FIREキャッシュフローシミュレータ<\/title>/.test(html), "title が見つかりません");
+  assert(/<title>生活キャッシュフローシミュレータ<\/title>/.test(html), "title が見つかりません");
   assert(hasId(html, "simulatorForm"), "simulatorForm が見つかりません");
   assert(hasId(html, "sampleButton"), "sampleButton が見つかりません");
   assert(hasId(html, "summaryCards"), "summaryCards が見つかりません");
@@ -88,3 +88,5 @@ function main() {
 }
 
 main();
+
+
